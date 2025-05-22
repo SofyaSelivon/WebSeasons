@@ -18,11 +18,11 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose version
 
-      - name: Build containers
-        run: docker-compose -f docker-compose.yml build
-
-      - name: Run containers
-        run: docker-compose -f docker-compose.yml up -d
+      - name: Build and run containers
+        run: |
+          docker-compose build
+          docker-compose up -d
+          docker-compose down
 
       - name: List running containers
         run: docker ps
