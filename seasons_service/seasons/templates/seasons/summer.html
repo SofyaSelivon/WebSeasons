@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Summer</title>
+  <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+</head>
+
+<body class = "summer">
+  <h1>Лето</h1>
+  <script src="{% static 'js/script.js' %}"></script>
+  <nav class="summer">
+      <ul>
+          <li><a href="{% url 'index' %}">Главная</a></li>
+          <li><a href="{% url 'season_view' season_name='winter' %}">Зима</a></li>
+          <li><a href="{% url 'season_view' season_name='spring' %}">Весна</a></li>
+          <li><a href="{% url 'season_view' season_name='summer' %}">Лето</a></li>
+          <li><a href="{% url 'season_view' season_name='autumn' %}">Осень</a></li>
+      </ul>
+  </nav>
+
+  <div id="auth-container">
+    <button id="auth-button">Войти/Зарегистрироваться</button>
+  </div>
+
+  <div id="user-info" style="display: none;">
+    <span id="user-name">Имя Фамилия</span>
+  </div>
+
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="form-title">Вход</h2>
+      <form id="auth-form">
+        <label for="first-name">Имя</label>
+        <input type="text" id="first-name" name="first-name" pattern="^[А-ЯЁ][а-яё]+$" title="Только буквы, первая заглавная" required>
+
+        <label for="last-name">Фамилия</label>
+        <input type="text" id="last-name" name="last-name" pattern="^[А-ЯЁ][а-яё]+$" title="Только буквы, первая заглавная" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" minlength="6" required>
+
+        <button type="submit">Войти</button>
+        <p id="switch-form">Нет аккаунта? <a href="#">Зарегистрироваться</a></p>
+      </form>
+    </div>
+  </div>
+  <div id="logout-container" style="display:none;">
+    <button id="logout-button">Выйти</button>
+  </div>
+
+  <div class="toc" tabindex="0">
+    <p>Оглавление</p>
+    <div class="menu-item3"><a href="#section1">Астрономическое лето</a></div>
+    <div class="menu-item3"><a href="#section2">Климатическое лето</a></div>
+    <div class="menu-item3"><a href="#section3">Календарное лето</a></div>
+  </div>
+
+  <img src="/media/images/summer.jpg" alt="Summer">
+
+  <p><strong>Ле́то</strong> — одно из четырёх времён года, между весной и осенью, характеризующееся наиболее высокой температурой окружающей среды. В день летнего солнцестояния дни самые длинные, а ночи самые короткие.</p>
+
+  <p>Слово «лето» в значении соответствующего сезона — очень древнее, в русскоязычных письменных источниках встречается ещё в Чудовской псалтыри (XI век).</p>
+
+  <p>Дата начала лета варьируется в зависимости от климата, традиций и культуры. Если в северном полушарии лето, то в Южном полушарии — зима, и наоборот. Состоит из трёх месяцев: в Северном полушарии — июня, июля и августа, в Южном — декабря, января и февраля.</p>
+
+  <section id = "section1">
+    <h2>Астрономическое лето</h2>
+    <p>С астрономической точки зрения равноденствия и солнцестояния были бы серединой соответствующих сезонов. Сезонные изменения на поверхности Земли обусловлены годичным периодом обращения планеты вокруг Солнца и наклоном оси её вращения относительно орбитальной плоскости. Но по традиции астрономии астрономическое лето в Северном полушарии — период между июньским солнцестоянием и сентябрьским равноденствием — продолжается с 21 (20) июня по 23 (22) сентября. В Южном полушарии астрономическое лето — период между декабрьским солнцестоянием и мартовским равноденствием — продолжается с 21 (22) декабря по 20 (21) марта.</p>
+    </section>
+    <section id = "section2">
+      <h3>Климатическое лето</h3>
+      <p>Согласно метеорологическому соглашению, лето включает июнь, июль и август в северном полушарии и декабрь, январь и февраль в южном полушарии. Согласно метеорологическим определениям, все времена года могут произвольно начинаться в начале календарного месяца и заканчиваться в конце месяца. Это метеорологическое определение лета также соответствует общепринятому представлению о лете как о сезоне с самыми длинными (и самыми теплыми) днями года, в которых преобладает дневной свет.</p>
+
+      <p>В разных географических поясах из-за неравномерности освещения Солнцем поверхности Земли летний сезон отличается от зимнего в различной степени. С увеличением широты возрастает разность в длительности светлого времени суток летом и зимой, достигающая максимума на полюсах, где Солнце летом не заходит за горизонт в течение 6 месяцев.</p>
+    </section>
+      <section id = "section3">
+        <h4>Календарное лето</h4>
+        <p>В России календарное лето продолжается с 1 июня по 31 августа и состоит из трёх месяцев — июня, июля и августа.</p>
+        </section>
+
+  <video width="640" height="360" controls>
+    <source src="/media/videos/video_summer.mp4" type="video/mp4">
+  </video>
+
+  <footer class="summer">
+    <ul>
+        <li><a href="Группа:">ПИН-26</a></li>
+        <li><a href="Студент:">Селивон С.</a></li>
+    </ul>
+  </footer>
+</body>
+
+</html>

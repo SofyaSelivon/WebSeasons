@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>The seasons</title>
+  {% load static %}
+  <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <script type="text/javascript">
+      window.CSRF_TOKEN = "{{ csrf_token }}";
+  </script>
+</head>
+
+<body class = "main">
+  <h1>Времена года</h1>
+  <nav class="main">
+      <ul>
+          <li><a href="{% url 'index' %}">Главная</a></li>
+          <li><a href="{% url 'season_view' season_name='winter' %}">Зима</a></li>
+          <li><a href="{% url 'season_view' season_name='spring' %}">Весна</a></li>
+          <li><a href="{% url 'season_view' season_name='summer' %}">Лето</a></li>
+          <li><a href="{% url 'season_view' season_name='autumn' %}">Осень</a></li>
+      </ul>
+  </nav>
+
+    <div id="auth-container">
+      <button id="auth-button">Войти/Зарегистрироваться</button>
+    </div>
+
+  <div id="user-info" style="display: none;">
+      <span id="user-name">Имя Фамилия</span>
+  </div>
+
+    <div id="auth-modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 id="form-title">Вход</h2>
+        <form id="auth-form">
+          {% csrf_token %}
+          <label for="first-name">Имя</label>
+          <input type="text" id="first-name" name="first-name" pattern="^[А-ЯЁ][а-яё]+$" title="Только буквы, первая заглавная" required>
+
+          <label for="last-name">Фамилия</label>
+          <input type="text" id="last-name" name="last-name" pattern="^[А-ЯЁ][а-яё]+$" title="Только буквы, первая заглавная" required>
+
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+
+          <label for="password">Пароль</label>
+          <input type="password" id="password" name="password" minlength="6" required>
+
+          <button type="submit">Войти</button>
+          <p id="switch-form">Нет аккаунта? <a href="#">Зарегистрироваться</a></p>
+        </form>
+      </div>
+    </div>
+    <div id="logout-container" style="display:none;">
+      <button id="logout-button">Выйти</button>
+    </div>
+  <<img src="/media/images/main.jpg" alt="Времена года">
+  <div class="rating-container">
+      <p>Оцените картинку:</p>
+      <button id="like-btn" class="rating-btn">Like (<span id="like-count">0</span>)</button>
+      <button id="dislike-btn" class="rating-btn">Dislike (<span id="dislike-count">0</span>)</button>
+  </div>
+
+
+
+  <p><strong>Времена́ го́да</strong> — части, которые выделяют в годовом цикле.</p>
+  <p>Времена года различаются:
+  <ul>
+      <li>Календарные времена года — в большинстве стран мира принято деление года на четыре сезона, по три календарных месяца в каждом. Однако индийский календарь, например, делит год на 6 сезонов, по 2 месяца в каждом, календарь саамов — на восемь, а в древности в некоторых культурах был широко распространён трёхсезонный календарь. В Китае эпохи Инь в году было лишь два сезона: первая половина года — чунь и вторая половина года — цю, позднее означавшее в китайском языке смену сезонов года слово чуньцю стало обозначать историческую хронику. Древнейший римский календарь содержал десять месяцев, причём первым месяцем считался март. Нума Помпилий провёл серьёзную реформу календаря, до него римляне делили год на десять месяцев, начиная счёт с марта, и заканчивая декабрём. Согласно новому календарю, были введены два новых месяца — январь и февраль в честь богов Януса и Феба. Таким образом, календарь, введённый Нумой Помпилием состоял из двенадцати месяцев.</li>
+      <li>Астрономические времена года, которые отсчитываются от точек равноденствия (весна, осень) и солнцестояния (лето, зима).</li>
+      <li>Фенология определяет длительность и сроки начала каждого климатического времени года в соответствии с природными явлениями (используя понятие «сезон»). Каждый сезон отличается характерными для него погодными и температурными условиями.</li>
+  </ul>
+  </p>
+
+  <button id="feedback-button">Обратная связь</button>
+<div id="feedback-modal" class="feedback">
+  <div class="feedback-content">
+    <span class="feedback-close">&times;</span>
+    <h6>Обратная связь</h6>
+    <form id="feedback-form">
+      <label for="feedback-name">Имя</label>
+      <input type="text" id="feedback-name" name="feedback-name" required>
+
+      <label for="feedback-email">Email</label>
+      <input type="email" id="feedback-email" name="feedback-email" required>
+
+      <label for="feedback-message">Сообщение</label>
+      <textarea id="feedback-message" name="feedback-message" required></textarea>
+
+      <button type="submit">Отправить</button>
+    </form>
+  </div>
+</div>
+
+  <footer class="main">
+      <ul>
+          <li><a href="Группа:">ПИН-26</a></li>
+          <li><a href="Студент:">Селивон С.</a></li>
+      </ul>
+  </footer>
+<script src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/likes.js' %}"></script>
+<form method="post" style="display:none">
+    {% csrf_token %}
+</form>
+
+</body>
+
+</html>

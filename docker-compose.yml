@@ -1,0 +1,56 @@
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./staticfiles:/staticfiles
+      - media_volume:/media
+    depends_on:
+      - seasons
+      - auth
+      - feedback
+
+  seasons:
+    build: ./seasons_service
+    volumes:
+      - ./seasons_service:/app
+      - ./staticfiles:/app/staticfiles
+      - media_volume:/app/seasons/media
+    env_file: .env
+    ports:
+      - "8000:8000"
+
+  auth:
+    build: ./auth_service
+    volumes:
+      - ./auth_service:/app
+      - ./staticfiles:/app/staticfiles
+    env_file: .env
+    ports:
+      - "8001:8000"
+    depends_on:
+      - db
+
+  feedback:
+    build: ./feedback_service
+    volumes:
+      - ./feedback_service:/app
+    env_file: .env
+    ports:
+      - "8002:8000"
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  media_volume:
+  pgdata:

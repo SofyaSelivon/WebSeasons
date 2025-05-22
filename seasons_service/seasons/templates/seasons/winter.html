@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Winter</title>
+  <link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
+</head>
+
+<body class = "winter">
+  <h1>Зима</h1>
+  <script src="{% static 'js/script.js' %}"></script>
+  <nav class="winter">
+      <ul>
+          <li><a href="{% url 'index' %}">Главная</a></li>
+          <li><a href="{% url 'season_view' season_name='winter' %}">Зима</a></li>
+          <li><a href="{% url 'season_view' season_name='spring' %}">Весна</a></li>
+          <li><a href="{% url 'season_view' season_name='summer' %}">Лето</a></li>
+          <li><a href="{% url 'season_view' season_name='autumn' %}">Осень</a></li>
+      </ul>
+  </nav>
+
+  <div id="auth-container">
+    <button id="auth-button">Войти/Зарегистрироваться</button>
+  </div>
+
+  <div id="user-info" style="display: none;">
+    <span id="user-name">Имя Фамилия</span>
+  </div>
+
+  <div id="auth-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="form-title">Вход</h2>
+      <form id="auth-form">
+        <label for="first-name">Имя</label>
+        <input type="text" id="first-name" name="first-name" pattern="^[А-ЯЁ][а-яё]+$" title="Только буквы, первая заглавная" required>
+
+        <label for="last-name">Фамилия</label>
+        <input type="text" id="last-name" name="last-name" pattern="^[А-ЯЁ][а-яё]+$" title="Только буквы, первая заглавная" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="password">Пароль</label>
+        <input type="password" id="password" name="password" minlength="6" required>
+
+        <button type="submit">Войти</button>
+        <p id="switch-form">Нет аккаунта? <a href="#">Зарегистрироваться</a></p>
+      </form>
+    </div>
+  </div>
+  <div id="logout-container" style="display:none;">
+    <button id="logout-button">Выйти</button>
+  </div>
+
+  <div class="toc" tabindex="0">
+    <p>Оглавление</p>
+    <div class="menu-item1"><a href="#section1">Астрономическая зима</a></div>
+    <div class="menu-item1"><a href="#section2">Календарная зима</a></div>
+    <div class="menu-item1"><a href="#section3">Климатическая зима</a></div>
+  </div>
+
+  <img src="/media/images/winter.jpg" alt="Winter">
+  <p><strong>Зима́</strong> — одно из четырёх времён года между осенью и весной.</p>
+
+  <p>Основной признак этого времени года — устойчивая низкая температура (ниже 0 градусов по Цельсию) во многих районах Земли, на поверхность земли выпадает и ложится снег.</p>
+  <section id = "section1">
+  <h2>Астрономическая зима</h2>
+  <p>Астрономическая зима на планете длится с момента зимнего солнцестояния до момента весеннего равноденствия, то есть в Северном полушарии Земли с 22 декабря до 21 марта, в Южном полушарии с 22 июня до 21 сентября. В разные годы (на Земле) эти астрономические моменты приходятся на разное время (в пределах указанных суток).</p>
+
+    <p>Астрономически, зимнее солнцестояние, являющееся днем года с наименьшим количеством часов дневного света, должно быть в середине зимнего сезона, хотя из-за инерционного отставания самый холодный период обычно следует через несколько недель после солнцестояния.</p>
+    </section>
+  <section id = "section2">
+  <h3>Календарная зима</h3>
+  <p>Календарная зима состоит из трёх месяцев: в Северном полушарии это декабрь, январь и февраль, в Южном — июнь, июль и август.</p>
+
+    <p>Привязка начала зимы к солнцестоянию закреплена в традициях рождественско-новогодних праздников и их языческих аналогов, которые на Руси называли Святками.</p>
+
+  <p>До XVIII века в Московском государстве зима считалась длящейся от Рождества Христова (25 декабря) до Благовещения (25 марта). В каждом времени года, как считалось, было по 91 дню и по полчетверти часа.</p>
+  </section>
+  <section id = "section3">
+  <h4>Климатическая зима</h4>
+  <p>Продолжительность зимы как климатического сезона с наиболее низкими для данной территории температурами воздуха отличается в зависимости от географической широты, расстояния Земли от Солнца, количества осадков, близости к океаническим течениям и т. д. Чем ближе к экватору географическая широта, тем короче зима. В субтропических широтах зима продолжается 1—2 месяцев, в умеренных — 3—4, в полярных — 6—7 и более месяцев, а в тропических широтах зимы в этом понимании не бывает.</p>
+
+  <p>Климатологи считают, что зима начинается при переходе среднесуточной температуры воздуха через ноль градусов Цельсия в сторону понижения. В России это время варьируется в зависимости от региона: самое раннее начало зимы отмечается в конце сентября (Якутия), самое позднее — в начале января (Краснодарский край). В Средней полосе переход среднесуточной температуры через ноль обычно происходит во второй половине ноября.</p>
+  </section>
+
+  <video width="640" height="360" controls>
+    <source src="/media/videos/video_winter.mp4" type="video/mp4">
+  </video>
+
+  <footer class="winter">
+      <ul>
+          <li><a href="Группа:">ПИН-26</a></li>
+          <li><a href="Студент:">Селивон С.</a></li>
+      </ul>
+  </footer>
+</body>
+
+</html>
