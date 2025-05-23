@@ -74,15 +74,10 @@ jobs:
     needs: build_feedback
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Render deploy for feedback_service
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_FEEDBACK_SERVICE_ID: ${{ secrets.RENDER_FEEDBACK_SERVICE_ID }}
+      - name: Trigger Render deploy for feedback_service via deploy hook
         run: |
-          curl -X POST \
-            -H "Authorization: Bearer $RENDER_API_KEY" \
-            -H "Accept: application/json" \
-            https://api.render.com/deploy/${RENDER_FEEDBACK_SERVICE_ID}
+          curl -X POST "https://api.render.com/deploy/srv-d0o0mf8dl3ps73a5ts50?key=MSlcjmM_z3k"
+
 
   build_seasons:
     runs-on: ubuntu-latest
@@ -116,12 +111,7 @@ jobs:
     needs: build_seasons
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Render deploy for seasons_service
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SEASONS_SERVICE_ID: ${{ secrets.RENDER_SEASONS_SERVICE_ID }}
+      - name: Trigger Render deploy for seasons_service via deploy hook
         run: |
-          curl -X POST \
-            -H "Authorization: Bearer $RENDER_API_KEY" \
-            -H "Accept: application/json" \
-            https://api.render.com/deploy/${RENDER_SEASONS_SERVICE_ID}
+          curl -X POST "https://api.render.com/deploy/srv-d0o0v7uuk2gs73fjdbv0?key=BTvCcegzE-M"
+  
