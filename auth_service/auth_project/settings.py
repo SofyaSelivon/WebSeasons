@@ -41,7 +41,8 @@ TEMPLATES = [{
         ],
     },
 }]
-WSGI_APPLICATION = "auth_project.wsgi.application"
+ROOT_URLCONF = 'auth_service.auth_project.urls'
+WSGI_APPLICATION = 'auth_service.auth_project.wsgi.application'
 
 import dj_database_url
 
