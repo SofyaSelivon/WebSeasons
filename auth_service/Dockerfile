@@ -6,6 +6,6 @@ COPY . /app
 RUN pip install --upgrade pip
 RUN pip install django psycopg2-binary django-cors-headers
 
-EXPOSE 8001
+EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py runserver 0.0.0.0:${PORT:-8000}"]
