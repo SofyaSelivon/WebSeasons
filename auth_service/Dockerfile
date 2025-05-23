@@ -8,4 +8,4 @@ RUN pip install django psycopg2-binary django-cors-headers dj_database_url gunic
 
 EXPOSE 8000
 
-CMD ["gunicorn", "auth_project.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["sh", "-c", "gunicorn auth_project.wsgi:application --bind 0.0.0.0:${PORT}"]
