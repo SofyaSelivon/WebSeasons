@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: auth-service
+    env: docker
+    repo: https://github.com/SofyaSelivon/WebSeasons
+    branch: main
+    dockerfilePath: auth_service/Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: DJANGO_SECRET_KEY
+        value: super-secret-key
+      - key: DATABASE_URL
+        sync: false
