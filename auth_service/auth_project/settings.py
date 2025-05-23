@@ -13,7 +13,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "auth_service.users",
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -41,15 +41,18 @@ TEMPLATES = [{
         ],
     },
 }]
-ROOT_URLCONF = 'auth_service.auth_project.urls'
-WSGI_APPLICATION = 'auth_service.auth_project.wsgi.application'
-
-import dj_database_url
+WSGI_APPLICATION = "auth_project.wsgi.application"
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mydatabase',
+        'USER': 'myuser',
+        'PASSWORD': 'mypassword',
+        'HOST': 'db',
+        'PORT': '5432',
+    }
 }
-
 
 
 AUTH_PASSWORD_VALIDATORS = []

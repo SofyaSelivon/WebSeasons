@@ -4,8 +4,8 @@ WORKDIR /app
 COPY . /app
 
 RUN pip install --upgrade pip
-RUN pip install django psycopg2-binary django-cors-headers dj_database_url gunicorn
+RUN pip install django psycopg2-binary django-cors-headers
 
-EXPOSE 8000
+EXPOSE 8001
 
-CMD ["sh", "-c", "gunicorn auth_service.auth_project.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
