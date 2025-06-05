@@ -1,44 +1,47 @@
-name: Deploy
+name: Deploy to Yandex Cloud
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Setup Yandex Cloud key
+      - name: Setup service account key
+        run: echo "${{ secrets.YC_SA_KEY }}" > key.json
+
+      - name: Install Yandex CLI
         run: |
-          echo "${{ secrets.YC_SA_KEY }}" > key.json
-          export YC_SA_KEY=key.json
+          curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
 
       - name: Authenticate to Yandex Cloud
         run: |
-          yc config set service-account-key-file $YC_KEY_FILE
+          yc config set service-account-key-file key.json
           yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
+          yc container registry configure-docker
 
-      - name: Build microservices
+      - name: Build and Push auth_service
         run: |
-          # Пример: сборка Docker образов
-          docker build -t my-service1 ./service1
-          docker build -t my-service2 ./service2
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth_service:latest ./auth_service
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth_service:latest
 
-      - name: Push Docker images
+      - name: Build and Push feedback_service
         run: |
-          # Аутентификация в Yandex Container Registry и пуш образов
-          yc container registry login
-          docker tag my-service1 cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service1:latest
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service1:latest
-          docker tag my-service2 cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service2:latest
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service2:latest
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/feedback_service:latest ./feedback_service
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/feedback_service:latest
+
+      - name: Build and Push seasons_service
+        run: |
+          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/seasons_service:latest ./seasons_service
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/seasons_service:latest
 
       - name: Deploy to Yandex Cloud
         run: |
-          # Пример: обновление Kubernetes deployment или Yandex Cloud Run
-          yc serverless container revision deploy ...
+          echo "Напиши здесь команды для деплоя — например, yc serverless container update ..."
