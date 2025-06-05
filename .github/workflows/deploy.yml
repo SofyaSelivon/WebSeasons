@@ -24,6 +24,11 @@ jobs:
         run: |
           sed -i 's/\\\\n/\n/g' key.json
 
+      - name: DEBUG - show key.json
+        run: |
+          cat key.json
+
+
       - name: Install Yandex CLI and login
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
