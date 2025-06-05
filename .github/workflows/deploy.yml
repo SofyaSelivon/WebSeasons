@@ -11,12 +11,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Create registry if not exists
-        run: |
-          if ! yc container registry list | grep -q "your-registry-name"; then
-            yc container registry create --name your-registry-name
-          fi
-
       - name: Setup YC CLI
         run: |
           # Установка yc CLI
