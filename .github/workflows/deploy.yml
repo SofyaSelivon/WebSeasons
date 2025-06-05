@@ -1,3 +1,10 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -18,11 +25,13 @@ jobs:
 
       - name: Build microservices
         run: |
+          # Пример: сборка Docker образов
           docker build -t my-service1 ./service1
           docker build -t my-service2 ./service2
 
       - name: Push Docker images
         run: |
+          # Аутентификация в Yandex Container Registry и пуш образов
           yc container registry login
           docker tag my-service1 cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service1:latest
           docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service1:latest
@@ -31,4 +40,5 @@ jobs:
 
       - name: Deploy to Yandex Cloud
         run: |
+          # Пример: обновление Kubernetes deployment или Yandex Cloud Run
           yc serverless container revision deploy ...
