@@ -16,35 +16,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers for auth_service
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache-auth
-          key: ${{ runner.os }}-docker-auth-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-docker-auth-
+      - name: Write SA key to file
+        run: echo "${{ secrets.YC_SA_KEY }}" > key.json
 
-      - name: Build auth_service Docker image
+      - name: Install Yandex CLI and login
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          export PATH="$HOME/yandex-cloud/bin:$PATH"
+          yc config set service-account-key key.json
+          yc config set folder-id b1gveceh5v6h6qadh4sa
+          yc container registry configure-docker
+
+      - name: Build and push Docker image to YCR
         uses: docker/build-push-action@v5
         with:
           context: ./auth_service
           file: ./auth_service/Dockerfile
-          push: false
-          tags: auth_service:latest
-          cache-from: type=local,src=/tmp/.buildx-cache-auth
-          cache-to: type=local,dest=/tmp/.buildx-cache-auth
-
-  deploy_auth:
-    needs: build_auth
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Render deploy for auth_service via deploy hook
-        run: |
-          curl -X POST "https://api.render.com/deploy/srv-d0o08c7diees739h5gg0?key=RTigzdo5x2U"
+          push: true
+          tags: cr.yandex/crpclij7sq8cnn8pf1km/auth_service:latest
 
   build_feedback:
+    needs: build_auth
     runs-on: ubuntu-latest
-    needs: deploy_auth
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -52,36 +45,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers for feedback_service
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache-feedback
-          key: ${{ runner.os }}-docker-feedback-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-docker-feedback-
+      - name: Write SA key to file
+        run: echo "${{ secrets.YC_SA_KEY }}" > key.json
 
-      - name: Build feedback_service Docker image
+      - name: Install Yandex CLI and login
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          export PATH="$HOME/yandex-cloud/bin:$PATH"
+          yc config set service-account-key key.json
+          yc config set folder-id b1gveceh5v6h6qadh4sa
+          yc container registry configure-docker
+
+      - name: Build and push Docker image to YCR
         uses: docker/build-push-action@v5
         with:
           context: ./feedback_service
           file: ./feedback_service/Dockerfile
-          push: false
-          tags: feedback_service:latest
-          cache-from: type=local,src=/tmp/.buildx-cache-feedback
-          cache-to: type=local,dest=/tmp/.buildx-cache-feedback
-
-  deploy_feedback:
-    needs: build_feedback
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Render deploy for feedback_service via deploy hook
-        run: |
-          curl -X POST "https://api.render.com/deploy/srv-d0o0mf8dl3ps73a5ts50?key=MSlcjmM_z3k"
-
+          push: true
+          tags: cr.yandex/crpclij7sq8cnn8pf1km/feedback_service:latest
 
   build_seasons:
+    needs: build_feedback
     runs-on: ubuntu-latest
-    needs: deploy_feedback
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -89,29 +74,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Cache Docker layers for seasons_service
-        uses: actions/cache@v4
-        with:
-          path: /tmp/.buildx-cache-seasons
-          key: ${{ runner.os }}-docker-seasons-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-docker-seasons-
+      - name: Write SA key to file
+        run: echo "${{ secrets.YC_SA_KEY }}" > key.json
 
-      - name: Build seasons_service Docker image
+      - name: Install Yandex CLI and login
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          export PATH="$HOME/yandex-cloud/bin:$PATH"
+          yc config set service-account-key key.json
+          yc config set folder-id b1gveceh5v6h6qadh4sa
+          yc container registry configure-docker
+
+      - name: Build and push Docker image to YCR
         uses: docker/build-push-action@v5
         with:
           context: ./seasons_service
           file: ./seasons_service/Dockerfile
-          push: false
-          tags: seasons_service:latest
-          cache-from: type=local,src=/tmp/.buildx-cache-seasons
-          cache-to: type=local,dest=/tmp/.buildx-cache-seasons
-
-  deploy_seasons:
-    needs: build_seasons
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Render deploy for seasons_service via deploy hook
-        run: |
-          curl -X POST "https://api.render.com/deploy/srv-d0o0v7uuk2gs73fjdbv0?key=BTvCcegzE-M"
-  
+          push: true
+          tags: cr.yandex/crpclij7sq8cnn8pf1km/seasons_service:latest
