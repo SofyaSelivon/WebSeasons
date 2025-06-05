@@ -69,7 +69,6 @@ jobs:
           push: true
           tags: cr.yandex/crpclij7sq8cnn8pf1km/feedback_service:latest
 
-
   build_seasons:
     needs: build_feedback
     runs-on: ubuntu-latest
