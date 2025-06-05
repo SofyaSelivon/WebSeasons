@@ -1,52 +1,82 @@
-name: Deploy Microservices
+name: Deploy to Yandex Cloud
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy-auth:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        working-directory: ./auth_service
+      - name: Create registry if not exists
         run: |
-          python -m pip install --upgrade pip
+          if ! yc container registry list | grep -q "your-registry-name"; then
+            yc container registry create --name your-registry-name
+          fi
 
-      - name: Set up YC CLI
+      - name: Setup YC CLI
         run: |
+          # Установка yc CLI
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          echo "${{ secrets.YC_SA_KEY }}" > key.json
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+          
+          # Создание файла ключа (без новых секретов)
+          echo '${{ secrets.YC_SA_KEY }}' > key.json
+          chmod 600 key.json
+          
+          # Настройка профиля
           yc config set service-account-key key.json
           yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
+          
+          # Получаем ID registry автоматически (не требует отдельного секрета)
+          YC_REGISTRY_REPOSITORY=$(yc container registry list --format json | jq -r '.[0].id')
+          echo "REGISTRY=cr.yandex/$YC_REGISTRY_REPOSITORY" >> $GITHUB_ENV
 
-      - name: Build Docker image
+      - name: Build and deploy Auth Service
         working-directory: ./auth_service
         run: |
-          docker build -t auth-service .
-
-      - name: Push to Yandex Container Registry
-        run: |
+          # Сборка и загрузка образа
+          docker build -t ${{ env.REGISTRY }}/auth-service:latest .
           yc container registry configure-docker
-          docker tag auth-service cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth-service:latest
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth-service:latest
-
-      - name: Deploy to Yandex Cloud
-        run: |
-          yc serverless container create --name auth-service
+          docker push ${{ env.REGISTRY }}/auth-service:latest
+          
+          # Деплой
+          yc serverless container create --name auth-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
           yc serverless container revision deploy \
             --container-name auth-service \
-            --image cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth-service:latest \
+            --image ${{ env.REGISTRY }}/auth-service:latest \
             --service-account-id ${{ secrets.YC_SA_ID }} \
             --cores 1 \
-            --memory 1GB \
-            --concurrency 1
+            --memory 1GB
+
+      - name: Build and deploy Feedback Service
+        working-directory: ./feedback_service
+        run: |
+          docker build -t ${{ env.REGISTRY }}/feedback-service:latest .
+          docker push ${{ env.REGISTRY }}/feedback-service:latest
+          
+          yc serverless container create --name feedback-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
+          yc serverless container revision deploy \
+            --container-name feedback-service \
+            --image ${{ env.REGISTRY }}/feedback-service:latest \
+            --service-account-id ${{ secrets.YC_SA_ID }} \
+            --cores 1 \
+            --memory 1GB
+
+      - name: Build and deploy Seasons Service
+        working-directory: ./seasons_service
+        run: |
+          docker build -t ${{ env.REGISTRY }}/seasons-service:latest .
+          docker push ${{ env.REGISTRY }}/seasons-service:latest
+          
+          yc serverless container create --name seasons-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
+          yc serverless container revision deploy \
+            --container-name seasons-service \
+            --image ${{ env.REGISTRY }}/seasons-service:latest \
+            --service-account-id ${{ secrets.YC_SA_ID }} \
+            --cores 2 \
+            --memory 2GB
