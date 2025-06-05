@@ -20,11 +20,11 @@ jobs:
         run: |
           echo '${{ secrets.YC_SA_KEY }}' | jq '.' > key.json
       
-      
 
       - name: Install Yandex CLI and login
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
           export PATH="$HOME/yandex-cloud/bin:$PATH"
           yc config set service-account-key key.json
           yc config set folder-id b1gveceh5v6h6qadh4sa
