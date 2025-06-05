@@ -18,9 +18,7 @@ jobs:
 
       - name: Write SA key to file
         run: |
-          cat <<EOF > key.json
-          ${{ secrets.YC_SA_KEY }}
-          EOF
+          echo "${{ secrets.YC_SA_KEY }}" | sed 's/\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
@@ -50,9 +48,7 @@ jobs:
 
       - name: Write SA key to file
         run: |
-          cat <<EOF > key.json
-          ${{ secrets.YC_SA_KEY }}
-          EOF
+          echo "${{ secrets.YC_SA_KEY }}" | sed 's/\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
@@ -82,9 +78,7 @@ jobs:
 
       - name: Write SA key to file
         run: |
-          cat <<EOF > key.json
-          ${{ secrets.YC_SA_KEY }}
-          EOF
+          echo "${{ secrets.YC_SA_KEY }}" | sed 's/\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
