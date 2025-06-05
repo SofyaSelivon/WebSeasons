@@ -15,7 +15,7 @@ jobs:
       - name: Setup Yandex Cloud key
         run: |
           echo "${{ secrets.YC_SA_KEY }}" > key.json
-          export YC_KEY_FILE=key.json
+          export YC_SA_KEY=key.json
 
       - name: Authenticate to Yandex Cloud
         run: |
