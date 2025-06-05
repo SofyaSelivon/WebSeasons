@@ -16,10 +16,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Save properly formatted YC SA key
+      - name: Save YC SA key to file
         run: |
-          echo '${{ secrets.YC_SA_KEY }}' | jq '.' > key.json
-      
+          printf '%s' "${{ secrets.YC_SA_KEY }}" | sed 's/\\\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
@@ -37,6 +36,7 @@ jobs:
           file: ./auth_service/Dockerfile
           push: true
           tags: cr.yandex/crpclij7sq8cnn8pf1km/auth_service:latest
+
 
   build_feedback:
     needs: build_auth
