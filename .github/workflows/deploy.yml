@@ -18,11 +18,11 @@ jobs:
 
       - name: Save raw secret to file
         run: |
-          printf '%s' "${{ secrets.YC_SA_KEY }}" > key_raw.json
+          printf '%s' "${{ secrets.YC_SA_KEY }}" > key.json
 
       - name: Replace \\n with real newlines
         run: |
-          sed -i 's/\\\\n/\n/g' key_raw.json
+          sed -i 's/\\\\n/\n/g' key.json
 
       - name: Install Yandex CLI and login
         run: |
@@ -52,11 +52,11 @@ jobs:
 
       - name: Save raw secret to file
         run: |
-          printf '%s' "${{ secrets.YC_SA_KEY }}" > key_raw.json
+          printf '%s' "${{ secrets.YC_SA_KEY }}" > key.json
 
       - name: Replace \\n with real newlines
         run: |
-          sed -i 's/\\\\n/\n/g' key_raw.json
+          sed -i 's/\\\\n/\n/g' key.json
       
 
       - name: Install Yandex CLI and login
@@ -87,11 +87,11 @@ jobs:
 
       - name: Save raw secret to file
         run: |
-          printf '%s' "${{ secrets.YC_SA_KEY }}" > key_raw.json
+          printf '%s' "${{ secrets.YC_SA_KEY }}" > key.json
 
       - name: Replace \\n with real newlines
         run: |
-          sed -i 's/\\\\n/\n/g' key_raw.json
+          sed -i 's/\\\\n/\n/g' key.json
       
 
       - name: Install Yandex CLI and login
