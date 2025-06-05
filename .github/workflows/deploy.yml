@@ -42,22 +42,28 @@ jobs:
       - name: Build and deploy Auth Service
         working-directory: ./auth_service
         run: |
-            # Сборка образа
-            docker build -t auth-service:latest .
-            
-            # Тегирование и загрузка
-            docker tag auth-service:latest ${{ env.FULL_REGISTRY }}/auth-service:latest
-            yc container registry configure-docker
-            docker push ${{ env.FULL_REGISTRY }}/auth-service:latest
-            
-            # Деплой
-            yc serverless container create --name auth-service || true
-            yc serverless container revision deploy \
-              --container-name auth-service \
-              --image ${{ env.FULL_REGISTRY }}/auth-service:latest \
-              --service-account-id ${{ secrets.YC_SA_ID }} \
-              --cores 1 \
-              --memory 1GB
+          # 1. Собираем образ с локальным тегом
+          docker build -t auth-service .
+
+          # 2. Получаем ID registry (автоматически)
+          REGISTRY_ID=$(yc container registry list --format=json | jq -r '.[0].id')
+          FULL_IMAGE_NAME="cr.yandex/${REGISTRY_ID}/auth-service:latest"
+
+          # 3. Тегируем образ для Yandex Registry
+          docker tag auth-service ${FULL_IMAGE_NAME}
+
+          # 4. Аутентификация и загрузка
+          yc container registry configure-docker
+          docker push ${FULL_IMAGE_NAME}
+
+          # 5. Деплой
+          yc serverless container create --name auth-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
+          yc serverless container revision deploy \
+            --container-name auth-service \
+            --image ${FULL_IMAGE_NAME} \
+            --service-account-id ${{ secrets.YC_SA_ID }} \
+            --cores 1 \
+            --memory 1GB
 
       - name: Build and deploy Feedback Service
         working-directory: ./feedback_service
