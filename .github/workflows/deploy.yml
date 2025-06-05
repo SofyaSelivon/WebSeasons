@@ -18,8 +18,7 @@ jobs:
 
       - name: Save Yandex Cloud service account key
         run: |
-          echo '${{ secrets.YC_SA_KEY }}' | sed 's/\\n/\n/g' > key.json
-
+          echo "${{ secrets.YC_SA_KEY }}" | sed 's/\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
@@ -49,18 +48,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Save raw secret to file
+      - name: Save Yandex Cloud service account key
         run: |
-          printf '%s' "${{ secrets.YC_SA_KEY }}" > key.json
-
-      - name: Replace \\n with real newlines
-        run: |
-          sed -i 's/\\\\n/\n/g' key.json
-      
+          echo "${{ secrets.YC_SA_KEY }}" | sed 's/\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
           export PATH="$HOME/yandex-cloud/bin:$PATH"
           yc config set service-account-key key.json
           yc config set folder-id b1gveceh5v6h6qadh4sa
@@ -74,6 +69,7 @@ jobs:
           push: true
           tags: cr.yandex/crpclij7sq8cnn8pf1km/feedback_service:latest
 
+
   build_seasons:
     needs: build_feedback
     runs-on: ubuntu-latest
@@ -84,18 +80,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Save raw secret to file
+      - name: Save Yandex Cloud service account key
         run: |
-          printf '%s' "${{ secrets.YC_SA_KEY }}" > key.json
-
-      - name: Replace \\n with real newlines
-        run: |
-          sed -i 's/\\\\n/\n/g' key.json
-      
+          echo "${{ secrets.YC_SA_KEY }}" | sed 's/\\n/\n/g' > key.json
 
       - name: Install Yandex CLI and login
         run: |
           curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
           export PATH="$HOME/yandex-cloud/bin:$PATH"
           yc config set service-account-key key.json
           yc config set folder-id b1gveceh5v6h6qadh4sa
