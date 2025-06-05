@@ -16,9 +16,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Write SA key to file
+      - name: Save raw secret to temp file
+        run: echo "${{ secrets.YC_SA_KEY }}" > raw_key.txt
+
+      - name: Convert \n to real newlines
         run: |
-          printf '%b' "${{ secrets.YC_SA_KEY }}" > key.json
+          sed -e 's/\\n/\n/g' raw_key.txt > key.json
+
+      - name: Check key.json
+        run: cat key.json
+
       
 
       - name: Install Yandex CLI and login
@@ -47,9 +54,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Write SA key to file
+      - name: Save raw secret to temp file
+        run: echo "${{ secrets.YC_SA_KEY }}" > raw_key.txt
+
+      - name: Convert \n to real newlines
         run: |
-          printf '%b' "${{ secrets.YC_SA_KEY }}" > key.json
+          sed -e 's/\\n/\n/g' raw_key.txt > key.json
+
+      - name: Check key.json
+        run: cat key.json
+
       
 
       - name: Install Yandex CLI and login
@@ -78,9 +92,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Write SA key to file
+      - name: Save raw secret to temp file
+        run: echo "${{ secrets.YC_SA_KEY }}" > raw_key.txt
+
+      - name: Convert \n to real newlines
         run: |
-          printf '%b' "${{ secrets.YC_SA_KEY }}" > key.json
+          sed -e 's/\\n/\n/g' raw_key.txt > key.json
+
+      - name: Check key.json
+        run: cat key.json
+
       
 
       - name: Install Yandex CLI and login
