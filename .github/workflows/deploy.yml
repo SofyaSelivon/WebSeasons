@@ -101,3 +101,24 @@ jobs:
             --service-account-id ${{ secrets.YC_SA_ID }} \
             --cores 1 \
             --memory 2GB
+
+      - name: Build and deploy Gateway Service
+        working-directory: ./gateway_service
+        run: |
+          docker build -t gateway-service .
+
+          REGISTRY_ID=$(yc container registry list --format=json | jq -r '.[0].id')
+          FULL_IMAGE_NAME="cr.yandex/${REGISTRY_ID}/gateway-service:latest"
+
+          docker tag gateway-service ${FULL_IMAGE_NAME}
+
+          yc container registry configure-docker
+          docker push ${FULL_IMAGE_NAME}
+
+          yc serverless container create --name gateway-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
+          yc serverless container revision deploy \
+            --container-name gateway-service \
+            --image ${FULL_IMAGE_NAME} \
+            --service-account-id ${{ secrets.YC_SA_ID }} \
+            --cores 1 \
+            --memory 1GB
