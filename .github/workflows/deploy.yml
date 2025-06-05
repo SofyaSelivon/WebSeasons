@@ -1,29 +1,34 @@
-name: Deploy
-
-on:
-  push:
-    branches:
-      - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install Yandex Cloud CLI
+      - name: Setup Yandex Cloud key
         run: |
-          curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          echo "$HOME/.yandex-cloud/bin" >> $GITHUB_PATH
+          echo "${{ secrets.YC_SA_KEY }}" > key.json
+          export YC_KEY_FILE=key.json
 
-      - name: Set up Yandex Cloud auth
+      - name: Authenticate to Yandex Cloud
         run: |
-          echo "${{ secrets.YC_SA_KEY }}" > ${{ runner.temp }}/yc_key.json
-          yc config set service-account-key ${{ runner.temp }}/yc_key.json
+          yc config set service-account-key-file $YC_KEY_FILE
+          yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
 
-      - name: Deploy Serverless Container
+      - name: Build microservices
         run: |
-          yc serverless container deploy --name your-container-name --image cr.yandex/your-registry/your-image:latest
+          docker build -t my-service1 ./service1
+          docker build -t my-service2 ./service2
+
+      - name: Push Docker images
+        run: |
+          yc container registry login
+          docker tag my-service1 cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service1:latest
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service1:latest
+          docker tag my-service2 cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service2:latest
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/my-service2:latest
+
+      - name: Deploy to Yandex Cloud
+        run: |
+          yc serverless container revision deploy ...
