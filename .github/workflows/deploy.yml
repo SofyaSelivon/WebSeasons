@@ -1,47 +1,52 @@
-name: Deploy to Yandex Cloud
+name: Deploy Microservices
 
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
+  deploy-auth:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup service account key
-        run: echo "${{ secrets.YC_SA_KEY }}" > key.json
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
 
-      - name: Install Yandex CLI
+      - name: Install dependencies
+        working-directory: ./auth_service
         run: |
-          curl https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
-          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
+          python -m pip install --upgrade pip
 
-      - name: Authenticate to Yandex Cloud
+      - name: Set up YC CLI
         run: |
-          yc config set service-account-key-file key.json
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "${{ secrets.YC_SA_KEY }}" > key.json
+          yc config set service-account-key key.json
           yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
           yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
+
+      - name: Build Docker image
+        working-directory: ./auth_service
+        run: |
+          docker build -t auth-service .
+
+      - name: Push to Yandex Container Registry
+        run: |
           yc container registry configure-docker
-
-      - name: Build and Push auth_service
-        run: |
-          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth_service:latest ./auth_service
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth_service:latest
-
-      - name: Build and Push feedback_service
-        run: |
-          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/feedback_service:latest ./feedback_service
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/feedback_service:latest
-
-      - name: Build and Push seasons_service
-        run: |
-          docker build -t cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/seasons_service:latest ./seasons_service
-          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/seasons_service:latest
+          docker tag auth-service cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth-service:latest
+          docker push cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth-service:latest
 
       - name: Deploy to Yandex Cloud
         run: |
-          echo "Напиши здесь команды для деплоя — например, yc serverless container update ..."
+          yc serverless container create --name auth-service
+          yc serverless container revision deploy \
+            --container-name auth-service \
+            --image cr.yandex/${{ secrets.YC_REGISTRY_REPOSITORY }}/auth-service:latest \
+            --service-account-id ${{ secrets.YC_SA_ID }} \
+            --cores 1 \
+            --memory 1GB \
+            --concurrency 1
