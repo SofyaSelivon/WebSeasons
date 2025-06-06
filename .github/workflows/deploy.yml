@@ -1,124 +1,33 @@
-name: Deploy to Yandex Cloud
+name: Deploy to VPS
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup YC CLI
+      - name: Prepare SSH key
         run: |
-          # Установка yc CLI
-          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
 
-          # Добавляем yc в PATH для текущей сессии
-          echo "$HOME/yandex-cloud/bin" >> $GITHUB_PATH
-          export PATH="$PATH:$HOME/yandex-cloud/bin"
-
-          # Даём время для обновления PATH
-          sleep 2
-
-          # Проверяем установку
-          yc --version
-
-          # Создаём файл ключа (проверяем первые 10 символов для отладки)
-          echo '${{ secrets.YC_SA_KEY }}' > key.json
-          echo "Key preview: $(head -c 20 key.json)..."
-          chmod 600 key.json
-
-          # Настройка профиля
-          yc config set service-account-key key.json
-          yc config set cloud-id ${{ secrets.YC_CLOUD_ID }}
-          yc config set folder-id ${{ secrets.YC_FOLDER_ID }}
-
-          # Проверка подключения
-          yc config list
-
-      - name: Build and deploy Auth Service
-        working-directory: ./auth_service
+      - name: Copy project files to server
         run: |
-          docker build -t auth-service .
+          rsync -az --delete \
+            -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app
 
-          REGISTRY_ID=$(yc container registry list --format=json | jq -r '.[0].id')
-          FULL_IMAGE_NAME="cr.yandex/${REGISTRY_ID}/auth-service:latest"
-
-          docker tag auth-service ${FULL_IMAGE_NAME}
-
-          yc container registry configure-docker
-          docker push ${FULL_IMAGE_NAME}
-
-          yc serverless container create --name auth-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
-          yc serverless container revision deploy \
-            --container-name auth-service \
-            --image ${FULL_IMAGE_NAME} \
-            --service-account-id ${{ secrets.YC_SA_ID }} \
-            --cores 1 \
-            --memory 1GB
-
-      - name: Build and deploy Feedback Service
-        working-directory: ./feedback_service
+      - name: Deploy via Docker Compose
         run: |
-          docker build -t feedback-service .
-
-          REGISTRY_ID=$(yc container registry list --format=json | jq -r '.[0].id')
-          FULL_IMAGE_NAME="cr.yandex/${REGISTRY_ID}/feedback-service:latest"
-
-          docker tag feedback-service ${FULL_IMAGE_NAME}
-
-          yc container registry configure-docker
-          docker push ${FULL_IMAGE_NAME}
-
-          yc serverless container create --name feedback-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
-          yc serverless container revision deploy \
-            --container-name feedback-service \
-            --image ${FULL_IMAGE_NAME} \
-            --service-account-id ${{ secrets.YC_SA_ID }} \
-            --cores 1 \
-            --memory 1GB
-
-      - name: Build and deploy Seasons Service
-        working-directory: ./seasons_service
-        run: |
-          docker build -t seasons-service .
-
-          REGISTRY_ID=$(yc container registry list --format=json | jq -r '.[0].id')
-          FULL_IMAGE_NAME="cr.yandex/${REGISTRY_ID}/seasons-service:latest"
-
-          docker tag seasons-service ${FULL_IMAGE_NAME}
-
-          yc container registry configure-docker
-          docker push ${FULL_IMAGE_NAME}
-
-          yc serverless container create --name seasons-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
-          yc serverless container revision deploy \
-            --container-name seasons-service \
-            --image ${FULL_IMAGE_NAME} \
-            --service-account-id ${{ secrets.YC_SA_ID }} \
-            --cores 1 \
-            --memory 2GB
-
-      - name: Build and deploy Gateway Service
-        working-directory: ./gateway_service
-        run: |
-          docker build -t gateway-service .
-
-          REGISTRY_ID=$(yc container registry list --format=json | jq -r '.[0].id')
-          FULL_IMAGE_NAME="cr.yandex/${REGISTRY_ID}/gateway-service:latest"
-
-          docker tag gateway-service ${FULL_IMAGE_NAME}
-
-          yc container registry configure-docker
-          docker push ${FULL_IMAGE_NAME}
-
-          yc serverless container create --name gateway-service --folder-id ${{ secrets.YC_FOLDER_ID }} || true
-          yc serverless container revision deploy \
-            --container-name gateway-service \
-            --image ${FULL_IMAGE_NAME} \
-            --service-account-id ${{ secrets.YC_SA_ID }} \
-            --cores 1 \
-            --memory 1GB
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /home/${{ secrets.SSH_USER }}/app
+            docker-compose down --remove-orphans
+            docker-compose build
+            docker-compose up -d
+          EOF
