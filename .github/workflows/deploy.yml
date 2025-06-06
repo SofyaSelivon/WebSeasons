@@ -25,9 +25,15 @@ jobs:
 
       - name: Deploy via Docker Compose
         run: |
-          ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            cd /home/${{ secrets.SSH_USER }}/app
-            docker-compose down --remove-orphans
-            docker-compose build
-            docker-compose up -d
-          EOF
+            ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+              set -e
+              cd /home/${{ secrets.SSH_USER }}/app || exit 1
+              echo "📂 In directory: $(pwd)"
+              echo "🧹 Stopping old containers..."
+              docker-compose down --remove-orphans || exit 1
+              echo "🔨 Building images..."
+              docker-compose build || exit 1
+              echo "🚀 Starting containers..."
+              docker-compose up -d || exit 1
+              echo "✅ Deploy complete!"
+            EOF
