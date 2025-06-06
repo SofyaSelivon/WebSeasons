@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy
 
 on:
   push:
@@ -18,38 +18,38 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
 
-      - name: Copy project files to server
+      - name: Copy files to server
         run: |
           rsync -az --delete \
             -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app
 
-      - name: Deploy via Docker Compose
+      - name: Deploy
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
 
             cd /home/${{ secrets.SSH_USER }}/app
-            echo "📂 In directory: $(pwd)"
+            echo "In directory: $(pwd)"
 
-            echo "🧹 Stopping old containers..."
+            echo "Stop old containers..."
             sudo docker-compose down --remove-orphans
 
-            echo "🔨 Building images..."
+            echo "Building"
             sudo docker-compose build
 
-            echo "🚀 Starting containers..."
+            echo "Start containers"
             sudo docker-compose up -d
 
-            echo "⏳ Waiting for database to be ready..."
+            echo "Wait for db"
             sleep 10
 
-            echo "📦 Applying migrations for auth..."
+            echo "Migrations for auth"
             sudo docker-compose exec -T auth python manage.py migrate
 
-            echo "📦 Applying migrations for seasons..."
+            echo "Migrations for seasons"
             sudo docker-compose exec -T seasons python manage.py migrate
 
-            echo "✅ Deployment complete!"
+            echo "Deploy ok"
           EOF
       
