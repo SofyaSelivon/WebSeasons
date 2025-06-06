@@ -8,7 +8,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -22,19 +21,26 @@ jobs:
         run: |
           rsync -az --delete \
             -e "ssh -i private_key.pem -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app/
+            ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/${{ secrets.SSH_USER }}/app
 
       - name: Deploy via Docker Compose
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
-            cd /home/${{ secrets.SSH_USER }}/app
+            cd /home/${{ secrets.SSH_USER }}/app || exit 1
             echo "📂 In directory: $(pwd)"
-            echo "🧹 Stopping old containers..."
-            sudo docker-compose down --remove-orphans
+            
+            echo "🧹 Stopping and removing old containers..."
+            sudo docker-compose down --remove-orphans || true
+            
+            echo "🧹 Pruning unused Docker objects (containers, networks, images, volumes)..."
+            sudo docker system prune -af --volumes || true
+            
             echo "🔨 Building images..."
-            sudo docker-compose build
+            sudo docker-compose build --no-cache || exit 1
+            
             echo "🚀 Starting containers..."
-            sudo docker-compose up -d
+            sudo docker-compose up -d || exit 1
+            
             echo "✅ Deploy complete!"
           EOF
