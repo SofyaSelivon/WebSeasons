@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -27,28 +28,31 @@ jobs:
         run: |
           ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
-            cd /home/${{ secrets.SSH_USER }}/app
 
-            echo "Stopping old containers..."
+            cd /home/${{ secrets.SSH_USER }}/app
+            echo "📂 In directory: $(pwd)"
+
+            echo "🧹 Stopping old containers..."
             sudo docker-compose down --remove-orphans
 
-            echo "Building images..."
+            echo "🔨 Building images..."
             sudo docker-compose build
 
-            echo "Starting containers..."
+            echo "🚀 Starting containers..."
             sudo docker-compose up -d
 
-            echo "Applying migrations..."
-            sudo docker-compose exec auth python manage.py migrate
+            echo "⏳ Waiting for database to be ready..."
+            sleep 10
 
-            echo "Creating superuser..."
-            sudo docker-compose exec -T auth python manage.py createsuperuser --noinput --username admin --email admin@example.com || true
+            echo "📦 Applying migrations..."
+            sudo docker-compose exec -T auth python manage.py migrate
 
-            echo "Setting password for superuser..."
-            sudo docker-compose exec -T auth python manage.py shell -c "from django.contrib.auth.models import User; u=User.objects.filter(username='admin').first(); u.set_password('admin'); u.save()"
+            echo "👑 Creating superuser if not exists..."
+            sudo docker-compose exec -T auth python manage.py shell -c "
+              from django.contrib.auth import get_user_model;
+              User = get_user_model();
+              User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'AdminPassword123');
+            "
 
-            # echo "Loading initial data..."
-            # sudo docker-compose exec auth python manage.py loaddata initial_data.json
-
-            echo "✅ Deploy complete!"
+            echo "✅ Deployment complete!"
           EOF
