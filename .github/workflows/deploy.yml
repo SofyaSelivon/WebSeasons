@@ -50,13 +50,6 @@ jobs:
             echo "📦 Applying migrations for seasons..."
             sudo docker-compose exec -T seasons python manage.py migrate
 
-            echo "👑 Creating superuser if not exists..."
-            sudo docker-compose exec -T auth python manage.py shell -c "
-              from django.contrib.auth import get_user_model;
-              User = get_user_model();
-              User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'AdminPassword123');
-            "
-
             echo "✅ Deployment complete!"
           EOF
       
