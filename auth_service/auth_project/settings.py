@@ -68,7 +68,7 @@ INSTALLED_APPS += ['corsheaders']
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://0.0.0.0:8000",
+    "http://84.252.132.167",
 ]
-SESSION_COOKIE_DOMAIN = ".0.0.0.0"
+SESSION_COOKIE_DOMAIN = None
 STATIC_ROOT = BASE_DIR / 'staticfiles'
