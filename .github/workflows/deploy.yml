@@ -36,27 +36,27 @@ jobs:
             sudo docker-compose down --remove-orphans
 
             echo "🔨 Building images..."
-            sudo docker-compose build --no-cache
+            sudo docker-compose build
 
             echo "🚀 Starting containers..."
             sudo docker-compose up -d
 
             echo "⏳ Waiting for database to be ready..."
-            sleep 15
+            sleep 10
 
-            echo "📦 Applying migrations..."
+            echo "📦 Applying migrations for auth..."
             sudo docker-compose exec -T auth python manage.py migrate
+
+            echo "📦 Applying migrations for seasons..."
+            sudo docker-compose exec -T seasons python manage.py migrate
 
             echo "👑 Creating superuser if not exists..."
             sudo docker-compose exec -T auth python manage.py shell -c "
               from django.contrib.auth import get_user_model;
               User = get_user_model();
-              if not User.objects.filter(username='admin').exists():
-                  User.objects.create_superuser('admin', 'admin@example.com', 'admin');
+              User.objects.filter(username='admin').exists() or User.objects.create_superuser('admin', 'admin@example.com', 'AdminPassword123');
             "
-
-            echo "📋 Showing last 50 lines of auth logs for verification:"
-            sudo docker-compose logs --tail=50 auth
 
             echo "✅ Deployment complete!"
           EOF
+      
