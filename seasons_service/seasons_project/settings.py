@@ -81,14 +81,16 @@ MEDIA_ROOT = BASE_DIR / "seasons" / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 CSRF_TRUSTED_ORIGINS = [
+    "http://84.252.132.167",
     "http://0.0.0.0:8000",
     "http://127.0.0.1:8000",
 ]
 
 
+
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_DOMAIN = ".0.0.0.0"
+SESSION_COOKIE_DOMAIN = None
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
