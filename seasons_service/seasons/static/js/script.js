@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (formTitle.innerText === "Регистрация") {
       try {
-        const response = await fetch("/register/", {
+        const response = await fetch("/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     } else {
       try {
-        const response = await fetch("/login/", {
+        const response = await fetch("/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -125,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function checkAuth() {
     try {
-      const response = await fetch("/check_auth/", {
+      const response = await fetch("/check_auth", {
       credentials: "include"
       });
       const data = await response.json();
